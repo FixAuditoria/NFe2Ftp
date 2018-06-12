@@ -30,52 +30,31 @@ app.loop = function(){
 };
 
 app.checkFolder = function() {
-    fs.readdir('./xml',function(err,files) {
+    //patter para extensão do arqivo
+    var pattern=/\.[0-9a-z]+$/i;
+
+    fs.readdir('./xml',(err,files) => {
         if(!err && files) {
             files.forEach(function(file) {
-                //TODO: implementar upload do arquivo
-                console.log(file);
+                //aplica o padrão no nome do arquivo para retirar a extensão
+                var ext = file.match(pattern);
+                if(ext.toString().toLowerCase() == '.xml') {
+                    //TODO: implementar upload do arquivo
+                    console.log(file + ' e a extensão é XML');
+                } else {
+                    console.log(file + ' e a extensão NÃO É XML');
+                }
             })//
         } else {
             console.log('1: erro obtendo lista de arquivos');
         }
     });
-    app.loop();
+    //app.loop();
 };//app.checkFolder
 
-/*
-Clean up function.
-Delete all expired tokens on startup!
-
-fs.readdir('./data/token',function(err,files) {
-    if(!err && files) {
-        files.forEach(function(file) {
-            _data.read('./token/',file.slice(0,-5),function(err,tokenData) {
-                if(!err) { 
-                    if(tokenData.expires < Date.now()) {
-                        _data.delete('./token/',file.slice(0,-5),function(err) {
-                            if(err) {
-                                console.log('could not delete old token ' + err);
-                            }
-                        });
-                    } else {
-                        console.log('token still valid: ' + tokenData.id);
-                    }
-                } else {
-                    console.log('could not delete token ' + err);
-                }
-            });
-        })//files.forEach
-    }
-});//fs.readdir */
-
-//app.init = function() {
-    //fazer a primeira leitura
-    
-    app.checkFolder();
-
-    //iniciar o loop
-    //app.loop();
-//};//app.init
-
+//define a função que vai ser executada no tempo pré definido em config.js
+setInterval(app.checkFolder,_config.time);
+console.log(JSON.stringify(_config));
 module.exports = app;
+
+//TODO: implementar gerador de arquivos de log

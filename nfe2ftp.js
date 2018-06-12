@@ -20,6 +20,9 @@ Estratégia
 var _config = require('./config');
 var fs = require('fs');
 
+var EvL = require('node-windows').EventLogger;
+var log = new EvL('Hello World2');
+
 var app = {};
 
 // Timer 
@@ -35,6 +38,7 @@ app.checkFolder = function() {
 
     fs.readdir('./xml',(err,files) => {
         if(!err && files) {
+            log.warn('Funcionando!! leu ' + files.length + ' arquivos!');
             files.forEach(function(file) {
                 //aplica o padrão no nome do arquivo para retirar a extensão
                 var ext = file.match(pattern);

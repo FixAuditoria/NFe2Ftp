@@ -1,0 +1,17 @@
+var Service = require('node-windows').Service;
+
+// Create a new service object
+var svc = new Service({
+  name:'Hello World2',
+  //script: require('path').join(__dirname,'helloworld.js')
+  script:'D:\\Dropbox\\Programming\\NodeJS\\IUB\\NFe2Ftp\\nfe2ftp.js'
+});
+
+// Listen for the "uninstall" event so we know when it's done.
+svc.on('uninstall',function(){
+  console.log('Uninstall complete.');
+  console.log('The service exists: ',svc.exists);
+});
+
+// Uninstall the service.
+svc.uninstall();

@@ -20,8 +20,8 @@ Estratégia
 var _config = require('./config');
 var fs = require('fs');
 
-var EvL = require('node-windows').EventLogger;
-var log = new EvL('Hello World2');
+//var EvL = require('node-windows').EventLogger;
+//var log = new EvL('Hello World2');
 
 var app = {};
 
@@ -38,7 +38,7 @@ app.checkFolder = function() {
 
     fs.readdir('./xml',(err,files) => {
         if(!err && files) {
-            log.warn('Funcionando!! leu ' + files.length + ' arquivos!');
+            //log.warn('Funcionando!! leu ' + files.length + ' arquivos!');
             files.forEach(function(file) {
                 //aplica o padrão no nome do arquivo para retirar a extensão
                 var ext = file.match(pattern);
@@ -56,8 +56,29 @@ app.checkFolder = function() {
     //app.loop();
 };//app.checkFolder
 
+
+var ftpConfig = {
+    'host' : 'robo.varitus.com.br',
+    'port' : 2121,
+    'user' : 'ftpbignotto',
+    'password' : 'bignotto@varitus'
+};
+
+var Client = require('ftp');
+ 
+var c = new Client();
+c.on('ready', function() {
+  c.list(function(err, list) {
+    if (err) throw err;
+    console.dir(list);
+    c.end();
+  });
+});
+// connect to localhost:21 as anonymous
+c.connect(ftpConfig);
+
 //define a função que vai ser executada no tempo pré definido em config.js
-setInterval(app.checkFolder,_config.time);
+//setInterval(app.checkFolder,_config.time);
 console.log(JSON.stringify(_config));
 module.exports = app;
 

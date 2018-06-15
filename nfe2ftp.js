@@ -25,6 +25,7 @@ var fs = require('fs');
 
 var app = {};
 
+var xmlFiles = [];
 // Timer 
 app.loop = function(){
     setInterval(function(){
@@ -32,11 +33,15 @@ app.loop = function(){
     },_config.time);
 };
 
+/*
+Verifica a pasta configurada em config.originFolder, lista os arquivos, cria um array somente com arquivos .xml e repassa
+esse array para a função app.uploadFiles
+*/
 app.checkFolder = function() {
-    //patter para extensão do arqivo
+    //pattern para extensão do arqivo
     var pattern=/\.[0-9a-z]+$/i;
 
-    fs.readdir('./xml',(err,files) => {
+    fs.readdir(_config.originFolder,(err,files) => {
         if(!err && files) {
             //log.warn('Funcionando!! leu ' + files.length + ' arquivos!');
             files.forEach(function(file) {
@@ -44,11 +49,14 @@ app.checkFolder = function() {
                 var ext = file.match(pattern);
                 if(ext.toString().toLowerCase() == '.xml') {
                     //TODO: implementar upload do arquivo
-                    console.log(file + ' e a extensão é XML');
+                    xmlFiles.push(file);
+                   // console.log(file + ' e a extensão é XML');
                 } else {
-                    console.log(file + ' e a extensão NÃO É XML');
+                   // console.log(file + ' e a extensão NÃO É XML');
                 }
-            })//
+            });//
+            app.uploadFiles(xmlFiles);
+            //TODO: limpar o array pra não reenviar nenhum arquivo
         } else {
             console.log('1: erro obtendo lista de arquivos');
         }
@@ -56,29 +64,35 @@ app.checkFolder = function() {
     //app.loop();
 };//app.checkFolder
 
+app.uploadFiles = function(files) {
+    console.log(files);
+};//app.uploadFiles
+
 
 var ftpConfig = {
-    'host' : 'robo.varitus.com.br',
-    'port' : 2121,
-    'user' : 'ftpbignotto',
-    'password' : 'bignotto@varitus'
+    'host' : _config.ftpServer,
+    'port' : _config.ftpPort,
+    'user' : _config.ftpUser,
+    'password' : _config.ftpPass
 };
 
 var Client = require('ftp');
- 
 var c = new Client();
 c.on('ready', function() {
   c.list(function(err, list) {
     if (err) throw err;
-    console.dir(list);
+    list.forEach(function(file) {
+        console.log(file.name);
+    });
+    //console.dir(list);
     c.end();
   });
 });
-// connect to localhost:21 as anonymous
 c.connect(ftpConfig);
+//app.checkFolder();
 
 //define a função que vai ser executada no tempo pré definido em config.js
-//setInterval(app.checkFolder,_config.time);
+setInterval(app.checkFolder,_config.time);
 console.log(JSON.stringify(_config));
 module.exports = app;
 

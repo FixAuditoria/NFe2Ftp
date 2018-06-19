@@ -80,12 +80,15 @@ var Client = require('ftp');
 var c = new Client();
 c.on('ready', function() {
   c.list(function(err, list) {
-    if (err) throw err;
+    if (err) {
+        console.log(err.name);
+        c.end();
+    } else {
     list.forEach(function(file) {
         console.log(file.name);
     });
     //console.dir(list);
-    c.end();
+    c.end(); }
   });
 });
 c.connect(ftpConfig);

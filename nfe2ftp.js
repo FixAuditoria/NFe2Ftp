@@ -8,24 +8,25 @@ Thiago Bignotto
 
 /*
 Estratégia
-1. Criar aquivo para configuração
-2. Criar thread para monitorar a pasta
-3. Obter lista de arquivos para enviar
-4. Conectar ao FTP
-5. Enviar arquivos
-6. Apagar arquivos originais depois de enviados
+1. [✓] Criar aquivo para configuração
+2. [✓] Criar thread para monitorar a pasta
+3. [✓] Obter lista de arquivos para enviar
+4. [✓] Conectar ao FTP
+5. [ ] Enviar arquivos
+6. [ ] Apagar arquivos originais depois de enviados
 */
 
 
 var _config = require('./config');
 var fs = require('fs');
+var Client = require('ftp');
 
 //var EvL = require('node-windows').EventLogger;
 //var log = new EvL('Hello World2');
 
+//container
 var app = {};
 
-var xmlFiles = [];
 // Timer 
 app.loop = function(){
     setInterval(function(){
@@ -38,6 +39,9 @@ Verifica a pasta configurada em config.originFolder, lista os arquivos, cria um 
 esse array para a função app.uploadFiles
 */
 app.checkFolder = function() {
+    //array com os nomes dos arquivos para upload
+    var xmlFiles = [];
+
     //pattern para extensão do arqivo
     var pattern=/\.[0-9a-z]+$/i;
 
@@ -48,15 +52,23 @@ app.checkFolder = function() {
                 //aplica o padrão no nome do arquivo para retirar a extensão
                 var ext = file.match(pattern);
                 if(ext.toString().toLowerCase() == '.xml') {
-                    //TODO: implementar upload do arquivo
                     xmlFiles.push(file);
                    // console.log(file + ' e a extensão é XML');
                 } else {
                    // console.log(file + ' e a extensão NÃO É XML');
                 }
-            });//
-            app.uploadFiles(xmlFiles);
-            //TODO: limpar o array pra não reenviar nenhum arquivo
+            });//forEach
+
+            if(xmlFiles.length > 0) {
+                app.uploadFiles(xmlFiles,function(err) {
+                    if(!err) {
+                        console.log('foram enviados ' + xmlFiles.length + ' com sucesso');
+                    } else {
+                        console.log(err);
+                    }
+                });
+                xmlFiles.length = 0;
+            }
         } else {
             console.log('1: erro obtendo lista de arquivos');
         }
@@ -64,8 +76,24 @@ app.checkFolder = function() {
     //app.loop();
 };//app.checkFolder
 
-app.uploadFiles = function(files) {
-    console.log(files);
+//TODO: implementar upload do arquivo
+app.uploadFiles = function(files,callback) {
+    //console.log(files);
+    var c = new Client();
+    c.on('ready',function() {
+        console.log('READYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY');
+        files.forEach(function(file) {
+            console.log('nao_processado\\' + file);
+            c.put(file,'nao_processado\\' + file, function(err) {
+                if(!err) {
+                    console.log('deu certo');
+                }
+                else throw err;
+            });
+        });
+        c.end();
+    });
+    c.connect(ftpConfig);
 };//app.uploadFiles
 
 
@@ -76,23 +104,19 @@ var ftpConfig = {
     'password' : _config.ftpPass
 };
 
-var Client = require('ftp');
-var c = new Client();
-c.on('ready', function() {
-  c.list(function(err, list) {
-    if (err) {
-        console.log(err.name);
-        c.end();
-    } else {
-    list.forEach(function(file) {
-        console.log(file.name);
-    });
-    //console.dir(list);
-    c.end(); }
-  });
-});
-c.connect(ftpConfig);
-//app.checkFolder();
+// var Client = require('ftp');
+ 
+// var c = new Client();
+// c.on('ready', function() {
+//   c.list(function(err, list) {
+//     if (err) throw err;
+//     list.forEach(function(file) {
+//         console.log(file.name);
+//     });
+//     c.end();
+//   });
+// });
+// c.connect(ftpConfig);
 
 //define a função que vai ser executada no tempo pré definido em config.js
 setInterval(app.checkFolder,_config.time);

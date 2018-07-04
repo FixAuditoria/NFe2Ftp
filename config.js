@@ -9,20 +9,20 @@ Thiago Bignotto
 //container
 var appConfig = {};
 
-appConfig.production = {
-    'envName' : 'production',
+appConfig.testing = {
+    'envName' : 'testing',
     'hashSecret' : 'nonono',
-    'originFolder' : '', //pasta onde os xmls são criados
+    'originFolder' : 'C:\\xml\\nao_processado', //pasta onde os xmls são criados
     'ftpFolder' : '', //pasta para enviar arquivos xmls
-    'time' : 1000 * 60 * 5, //tempo para verificar a pasta por novos xmls
-    'ftpServer' : '',
-    'ftpPort' : '',
+    'time' : 1000 * 5, //tempo para verificar a pasta por novos xmls
+    'ftpServer' : 'localhost',
+    'ftpPort' : '21',
     'ftpUser' : '',
     'ftpPass' : ''
 };
 
-appConfig.testing = {
-    'envName' : 'testing',
+appConfig.production = {
+    'envName' : 'production',
     'hashSecret' : 'nonono',
     'originFolder' : 'C:\\xml\\nao_processado', //pasta onde os xmls são criados
     'ftpFolder' : 'nao_processado', //pasta para enviar arquivos xmls
@@ -30,7 +30,7 @@ appConfig.testing = {
     'ftpServer' : 'robo.varitus.com.br',
     'ftpPort' : 2121,
     'ftpUser' : 'ftpbignotto',
-    'ftpPass' : 'bignotto@varitus'
+    'ftpPass' : ''
 };
 
 //determining wich config variables to export based on the environment variable
